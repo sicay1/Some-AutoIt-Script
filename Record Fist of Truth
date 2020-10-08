@@ -1,0 +1,312 @@
+#cs ----------------------------------------------------------------------------
+ AutoIt Version: 3.3.14.0
+ Author:         Sicay
+ Hardware
+   Screen 1920x1200 Dell U2415H
+ Software:
+   Memu emulator 1440x900 240dpi Microvirt ver 3.5.0
+   Fist of Truth v1.0.5 base on GooglePlay
+   OBS - run as admin
+ Script Function:
+   Auto record Replay video.
+	  current version only can stop replay by hand (hotkey Alt+X).
+	  record 3 first replay only.
+
+; Script Start
+#ce ----------------------------------------------------------------------------
+#RequireAdmin
+#include <ScreenCapture.au3>
+#include <MsgBoxConstants.au3>
+#include <Date.au3>
+#include <WinAPIFiles.au3>
+#include <FileConstants.au3>
+#include <File.au3>
+#include <Array.au3>
+#include <AutoItConstants.au3>
+
+AutoItSetOption("MouseCoordMode", 2) ;1=absolute, 0=relative, 2=client
+AutoItSetOption("PixelCoordMode", 0)
+
+; cac bien
+   ;duong dan luu record
+	  $pathRecord = "D:\video\Replay\"
+	  $pathTemp = "D:\video\Replay\TempRecord\"
+
+	  $imgExt = ".jpg"
+	  $videoExt = ".mkv"
+
+   ;=======Main Screen================
+   ;FOT Main screen: RECORD button
+	  Global $vitriRecordBtn[2] = ["924", "823"]
+	  $mauRecordBtn = 0xFFE321
+   ;FOT Main screen: DESK button
+	  Global $vitriDeskBtn[2] = ["1329", "826"]
+	  $mauDeskBtn = 0x8C55DE
+   ;FOT Main screen: SHOP button
+	  Global $vitriShopBtn[2] = ["89", "799"]
+	  $mauShopBtn = 0xE76929
+
+
+   ;=======Record screen================
+   ;Record Title
+	  Global $RecordTitleCoord1[2] = ["681", "177"]
+	  $RecordTitleCoord1Color = 0xFFFBFF
+	  Global $RecordTitleCoord2[2] = ["769", "182"]
+	  $RecordTitleCoord2Color = 0xEFEFE7
+
+   ;Mep trai khung replay dau tien
+	  $mepTraiHinh_ToadoX = 305
+
+   ;Mep phai khung replay dau tien
+	  $mepPhaiHinh_ToadoX = 990 ; ver 3.3
+
+   ;1 diem vien tren (giua title rank va country flag)
+	  $VitritrongVienX = 392 ;ver 3.3
+	  $VienColor = 0x4A2C18
+
+   ;Mep trai khung vien cua Button bat dau xem replay
+	  $VitriVienNutReplayX = 1018
+	  $MauVienNutReplay = 0x422C10
+
+   ;bien de biet co dang record bang OBS khong
+	  $RecordingReplay = True
+
+   ;FOT Replay screen pick replay to watch
+	  $timtu_vitriY = 220
+	  $timden_vitriY = 628
+	  $CacReplayCachNhau = 137
+
+   ;FOT Replay screen watching: STOP button
+	  Global $vitriNutStopReplay[2] = ["830", "761"]
+	  $mauNutStopReplay = 0xDE4142
+
+   ;Left die
+	  Global $vitriTraiThua1[2] = ["1431", "642"]
+	  $mauTraiThua1 = 0xB5DFF7
+   	  Global $vitriTraiThua2[2] = ["1430", "459"]
+	  $mauTraiThua2 = 0xADDBEF
+	  Global $vitriTraiThua3[2] = ["1431", "336"]
+	  $mauTraiThua3 = 0x9CD7EF
+
+   ;Right die
+	  Global $vitriPhaiThua1[2] = ["10", "549"]
+	  $mauPhaiThua1 = 0xCEEFF7
+   	  Global $vitriPhaiThua2[2] = ["8", "429"]
+	  $mauPhaiThua2 = 0xEFFBFF
+	  Global $vitriPhaiThua3[2] = ["7", "350"]
+	  $mauPhaiThua3 = 0xE7F7FF
+
+   ;So lan scroll replay
+   $SoLanScroll = 0
+
+;=========================================
+;=================Main====================
+;=========================================
+   Local $hWnd = WinWait("(xynot)")
+   HotKeySet("!d", "Terminate") ; Alt-d
+   HotKeySet("!x", "StopReplay")
+
+   WinActivate($hWnd)
+   Sleep(1000)
+;Check OBS Start
+;MEMUPlayStartFOT()
+   FOTAccessRecordScreen()
+
+
+;~ Sleep(2000)
+;~    Local $abc = SearchRecordCoord()
+;~    MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+;~    Sleep(2000)
+;~    $abc = SearchRecordCoord()
+;~ MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+
+;~ Sleep(2000)
+;~     $abc = SearchRecordCoord()
+;~ MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+
+;~ Sleep(2000)
+;~    $abc = SearchRecordCoord()
+;~ MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+;~ Sleep(2000)
+;~    $abc = SearchRecordCoord()
+;~ MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+;~    Sleep(2000)
+;~    $abc = SearchRecordCoord()
+;~ MouseMove(643, $abc[2] + 135, 0)
+;~    MouseClickDrag($MOUSE_CLICK_LEFT, 643, $abc[2] + 135, 643, 148, 50)
+
+;~    $abc = SearchRecordCoord()
+;~    MsgBox($MB_SYSTEMMODAL, "", $abc[2])
+
+   RecordReplay()
+
+
+;~    Local $VitriReplayY = SearchRecordCoord()
+;~    MsgBox($MB_SYSTEMMODAL, "", "cac vitri " & $VitriReplayY[0] & " " & $VitriReplayY[1] & " " & $VitriReplayY[2])
+;=========================================
+;=========================================
+;=========================================
+
+
+
+Func FOTAccessRecordScreen()
+   ;kiem tra dang o screen nao
+   ;neu dang o main screen thi click RECORD button
+      If PixelGetColor($vitriRecordBtn[0], $vitriRecordBtn[1]) = $mauRecordBtn Then
+		 MouseClick("left", $vitriRecordBtn[0], $vitriRecordBtn[1], 1, 1)
+	  EndIf
+   ;neu dang o screen khac
+
+EndFunc
+
+;compare picture, make sure no repeate Record.
+;vidu khi quay video, den video thu 2, thi co record-replay moi, no se nhay video thu 2 xuong thanh thu 3,
+;loop next lai quay video thu 3 lam cho Record bi trung
+Func RecordReplay()
+   ;FOT game, lay vitri cac replay cua game
+	  Local $VitriReplayY = SearchRecordCoord()
+   For $y =0 to $SoLanScroll
+	  ;voi moi replay
+	  For $i = 0 to UBound($VitriReplayY) - 1
+		 ;chup hinh khung replay
+		 ;chup hinh replay luu ra file hinh. Bo khung vien.
+			Local $fn = $pathTemp & @YEAR & "-" & @MON & "-" & @MDAY & "-" & @HOUR & "_" & @MIN & "_" & $VitriReplayY[$i]
+			Local $Imagefn = $fn & $imgExt
+			_ScreenCapture_CaptureWnd($Imagefn , $hWnd, $mepTraiHinh_ToadoX + 8, $VitriReplayY[$i] + 6, $mepPhaiHinh_ToadoX, $VitriReplayY[$i] + 133)
+
+
+		 ;kiem tra nut de xem replay truoc khi click
+		 If PixelGetColor($VitriVienNutReplayX, $VitriReplayY[$i] + 85) = $MauVienNutReplay Then
+			MouseClick("left", $VitriVienNutReplayX, $VitriReplayY[$i] + 85, 1, 1)
+			Sleep(1000)
+
+			;chay vlc nghe nhac, VLC ----> Snaz ----> OBS text GUI+, show ten bai hat
+   ;~ 			Local $hWnd11 = WinGetHandle("[REGEXPTITLE:VLC]")
+   ;~ 			ControlSend($hWnd11, "", "", "{SPACE}")
+   ;~ 			Sleep(100)
+   ;~ 			ControlSend($hWnd11, "", "", "n")
+   ;~ 			Sleep(100)
+   ;~ 			ControlSend($hWnd11, "", "", "{SPACE}")
+
+			;active cua so OBS chay record, set bien
+			   WinActivate("OBS")
+			   ;hotkey de mo OBS Sence record play
+			   Send("!+f") ; press  alt + shift + e
+			   Sleep(100)
+			   ;OBS hotkey de start quay clip
+			   Send("!+e") ; press  alt + shift + e
+			   $RecordingReplay = True
+
+			;quay lai cua so FOT game
+			   WinActivate($hWnd)
+
+
+			;doi toi khi gia tri bien $RecordingReplay = false
+			   Do
+				  Sleep(100)
+				  if PixelGetColor($vitriTraiThua1[0], $vitriTraiThua1[1]) = $mauTraiThua1 Or PixelGetColor($vitriTraiThua2[0], $vitriTraiThua2[1]) = $mauTraiThua2 Or PixelGetColor($vitriTraiThua3[0], $vitriTraiThua3[1]) = $mauTraiThua3 Then
+					 Sleep(3000)
+					 ExitLoop
+				  EndIf
+
+				  if PixelGetColor($vitriPhaiThua1[0], $vitriPhaiThua1[1]) = $mauPhaiThua1 Or PixelGetColor($vitriPhaiThua2[0], $vitriPhaiThua2[1]) = $mauPhaiThua2 Or PixelGetColor($vitriPhaiThua3[0], $vitriPhaiThua3[1]) = $mauPhaiThua3 Then
+					 Sleep(3000)
+					 ExitLoop
+				  EndIf
+
+
+			   Until $RecordingReplay = False
+
+			;chay vlc nghe nhac, VLC ----> Snaz ----> OBS text GUI+, show ten bai hat
+   ;~ 			Local $hWnd11 = WinGetHandle("[REGEXPTITLE:VLC]")
+   ;~ 			ControlSend($hWnd11, "", "", "s")
+   ;~ 			Sleep(1000)
+
+			;Tat OBS recod
+			   WinActivate("OBS")
+			   Send("!+x") ; press  alt + shift + x to stop OBS record
+			   $RecordingReplay = False
+
+			;Active lai cua so game FOT
+			   WinActivate($hWnd)
+
+			;FOT game, kiem tra nut stop replay truoc khi click
+			   If PixelGetColor($vitriNutStopReplay[0], $vitriNutStopReplay[1]) = $mauNutStopReplay Then
+				  MouseClick("left", $vitriNutStopReplay[0], $vitriNutStopReplay[1], 1, 1)
+				  Sleep(1000)
+			   EndIf
+
+			;wait time for OBS finish create video file
+			;need to show countdown for this
+			   Sleep(5000)
+
+			;rename video same as image name
+			;move video and image to upper folder
+			   Local $sDrive = "", $sDir = "", $sFileName = "", $sExtension = ""
+			   Local $aPathSplit = _PathSplit($Imagefn, $sDrive, $sDir, $sFileName, $sExtension)
+			   FileMove($pathTemp & "*" & $videoExt, $pathRecord & $aPathSplit[3] & $videoExt)
+			   FileMove($pathTemp & "*" & $imgExt, $pathRecord)
+
+
+			;FOT game, kiem tra co nut RECORD o man hinh chinh khong truoc khi click
+			   If PixelGetColor($vitriRecordBtn[0], $vitriRecordBtn[1]) = $mauRecordBtn Then
+				  MouseClick("left", $vitriRecordBtn[0], $vitriRecordBtn[1], 1, 1)
+				  Sleep(2000)
+			   EndIf
+		 EndIf
+	  Next
+
+   MouseMove(643, $VitriReplayY[2] + 134, 0)
+   MouseClickDrag($MOUSE_CLICK_LEFT, 643, $VitriReplayY[2] + 134, 643, 148, 50)
+   Next
+
+   MsgBox($MB_SYSTEMMODAL, "", "Record Replay Done.")
+EndFunc
+
+
+
+Func SearchRecordCoord($searchstartY = $timtu_vitriY)
+   ;vitrivien TREN cuoi cung co the xuat hien
+   $searchendY = $timden_vitriY
+
+   ;Toi da 3 replay. toi thieu 2 replay voi phan tu Array[2] =-1
+   Local $ArrReplay[3] = [-1, -1, -1]
+   $i = 0
+
+   While $searchstartY < $searchendY
+	  ;neu vitrivien TREN và vitrivien DUOI (TREN+137) va vitri nut Replay
+   	  If PixelGetColor($VitritrongVienX, $searchstartY) = $VienColor And PixelGetColor($VitritrongVienX, $searchstartY + 137) = $VienColor And PixelGetColor($VitriVienNutReplayX, $searchstartY + 85) = $MauVienNutReplay Then
+		 ;Luu vitri vo Array
+		 $ArrReplay[$i] = $searchstartY
+		 ;tang Array len 1 de luu vo phan tu Array ke tiep
+		 $i+=1
+		 ;nhay khoi vitrivien DUOI de tim nhanh hon
+		 $searchstartY += $CacReplayCachNhau + 3
+	  EndIf
+	  ;tim khong thay vitrivien TREN thi tang them 1 de tim pixel ke tiep
+	  $searchstartY += 1
+   WEnd
+   Return $ArrReplay
+EndFunc
+
+
+
+Func Terminate()
+    Exit
+EndFunc   ;==>Terminate
+
+
+Func StopReplay()
+    $RecordingReplay = Not $RecordingReplay
+EndFunc   ;==>Terminate
+
