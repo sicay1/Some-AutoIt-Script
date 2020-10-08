@@ -1,0 +1,194 @@
+Auto Record Clash Royale and post to Youtube channel
+Author:         Sicay
+ AutoIt Version: 3.3.12.0
+
+ Init:
+ Bluestack2 full screen
+ OBS > 	Bluestacks
+ 		encoding > x264, quality balance 10, max bitrate 3500, chech custom buffer size, buffer size 0
+		video > FPS 60
+		Advaned > keyframe 2
+
+; Script Start
+#ce ----------------------------------------------------------------------------
+
+#include <ScreenCapture.au3>
+#include <Date.au3>
+#include <MsgBoxConstants.au3>
+Opt("MouseCoordMode", 0) ;1=absolute, 0=relative, 2=client
+Opt("PixelCoordMode", 0)
+HotKeySet("!d", "Terminate") ; Alt-d
+$hWnd = WinWait("Bluestacks App Player")
+;Sleep(5000)
+WinActivate($hWnd)
+
+MouseClick("left", 1035, 1829, 1, 1) ;Go to tab TV Royale 0xFDFDB4
+  Sleep(3000)
+While 1
+   Local $BtnWatch = SearchReplayCoord();
+	  If $BtnWatch <> 0 Then
+		 Sleep(1000)
+
+		 $fn = "D:\OBSVideo\" & @MDAY & @HOUR & @MIN & "_Image.jpg"
+		 _ScreenCapture_CaptureWnd($fn, $hWnd, 122, $BtnWatch[1]-419, 1076, $BtnWatch[1]+64) ;~ take screenshot before start record
+		 MouseClick("left", $BtnWatch[0], $BtnWatch[1], 1, 1) ;~ click start recording
+
+		 StartRecord()
+			Sleep(180000) ; sleep 3 mins
+		 StopRecord()
+			MouseClick("left", 1033, 969, 1, 1) ;Replay ended, OK Button of return to TV Royale 0xFFFFFF
+			Sleep(3000)
+	  EndIf
+
+   ;Empty Area can not scroll more
+   If PixelGetColor(510, 1520) == 0x384B5E And PixelGetColor(510, 1640) == 0x384B5E Then
+	  ExitLoop
+   EndIf
+
+   If $BtnWatch == 0 Then
+	  MouseClickDrag("left", 1102, 1109, 1092, 54, 10)
+	  Sleep(3000)
+   EndIf
+
+WEnd
+
+MouseClick("left", 517, 1819, 1, 1) ;back to main screen 0xBCF3FF
+MsgBox($MB_SYSTEMMODAL, '', "All replay watched ")
+
+
+
+
+;~ ================Function================
+Func SearchReplayCoord()
+   $searchstart = 52
+   While $searchstart < 1590 ;1690
+   Local $WatchBtn_Coord = PixelSearch(510, $searchstart, 510, 1590, 0x38E448) ;1690
+   If Not @error Then
+	  If PixelGetColor(690, $WatchBtn_Coord[1]) == 0x38E448 And PixelGetColor(725, $WatchBtn_Coord[1]) == 0xFFFFFF Then
+;~ 			MouseClick("left", 745, $WatchBtn_Coord[1], 1, 1)
+			Return $WatchBtn_Coord
+			Exit
+		 EndIf
+	  $searchstart = $WatchBtn_Coord[1] + 280
+   EndIf
+   $searchstart += 1
+   WEnd
+EndFunc
+
+Func StartRecord()
+   While 1
+	  If PixelGetColor(80, 57) == 0x5C231B Then
+		 Sleep(50)
+		 Local $OBSwindow = WinWait("[CLASS:OBSWindowClass]", "", 10)
+			WinActivate($OBSwindow)
+			MouseClick("left", 559, 509, 1, 1)
+			Sleep(3000)
+			WinActivate($hWnd)
+;~ 		 ControlClick($OBSwindow, "", "[CLASS:Button; INSTANCE:5]", "left", 1, 70, 11)
+;~ 		 ControlClick($OBSwindow, "", "[CLASS:Button; INSTANCE:5]") ; OBS start/stop record button
+		 ExitLoop
+	  EndIf
+	  Sleep(100)
+   WEnd
+EndFunc
+
+Func StopRecord()
+
+;~    Call("StopRecord", 188, "Running ")
+;~    MsgBox($MB_SYSTEMMODAL, '', "Running stoprecord")
+   ;stop record when OK button ready
+   while 1
+	  If PixelGetColor(1033, 969) == 0xFFFFFF And PixelGetColor(1033, 1004) == 0xFFFFFF Then
+		 Sleep(4000)
+		 Local $OBSwindow = WinWait("[CLASS:OBSWindowClass]", "", 10)
+			WinActivate($OBSwindow)
+			MouseClick("left", 559, 509, 1, 1)
+			Sleep(500)
+			WinActivate($hWnd)
+		 ExitLoop
+	  EndIf
+
+	  Sleep(100)
+   WEnd
+EndFunc
+
+Func RecordVideo()
+   MouseClick("left", 1035, 1829, 1, 1) ;Go to tab TV Royale 0xFDFDB4
+	  Sleep(3000)
+
+;~ got 1 new replay,
+;~ >>>> Mouse <<<<
+;~ Position:	1072, 1760
+;~ Cursor ID:	0
+;~ Color:	0xD01C5C
+;~ >>>> Mouse <<<<
+;~ Position:	1082, 1762
+;~ Cursor ID:	0
+;~ Color:	0xEAEAEA
+;~ >>>> Mouse <<<<
+;~ Position:	1083, 1746
+;~ Cursor ID:	0
+;~ Color:	0xEAEAEA
+
+;~ >>>> Mouse <<<<
+;~ Position:	1082, 1756
+;~ Cursor ID:	0
+;~ Color:	0xEAEAEA
+
+;~    ;~ Check replay watched or not. Gray box, have watched text
+   If PixelGetColor(437, 742) == 0xCCCCCC And PixelGetColor(553, 327) == 0x66FF99 Then
+	  Exit
+   EndIf
+
+   MouseClick("left", 542, 753, 1, 1) ;Replay1 Watch button 0x38E448
+	  Sleep(1500)
+
+;~    MouseClick("left", 529, 1255, 1, 1) ;Replay2 Watch button 0x38E448
+;~ 	  Sleep(1500)
+
+   ;start record after loading replay time
+   while 1
+	  If PixelGetColor(179, 70) == 0x59221B And PixelGetColor(300, 1724) == 0x692D23 Then
+		 Sleep(100)
+		 Local $OBSwindow = WinWait("[CLASS:OBSWindowClass]", "", 10)
+		 ControlClick($OBSwindow, "", "Button5") ; OBS start/stop record button
+	  EndIf
+	  Sleep(100)
+   WEnd
+
+   ;stop record when OK button ready
+   while 1
+	  If PixelGetColor(1033, 969) == 0xFFFFFF And PixelGetColor(1033, 1004) == 0xFFFFFF Then
+		 Sleep(4000)
+		 ControlClick($OBSwindow, "", "Button5") ; OBS start/stop record button
+		 ExitLoop
+	  EndIf
+	  Sleep(100)
+   WEnd
+
+   MouseClick("left", 1033, 969, 1, 1) ;OK Button of return to TV Royale 0xFFFFFF
+	  Sleep(3000)
+
+	  MouseClick("left", 517, 1819, 1, 1) ;back to main screen 0xBCF3FF
+	  Sleep(1500)
+
+EndFunc
+
+Func CurrentAction($sleepsec, $textdis)
+   $message = ""
+   $message1 = $textdis & " " & $message
+   ;msgbox kich thuoc 150x40 o vitri theo truc X, giua cai app bluestack
+   SplashTextOn("Please wait!", $message, 150, 40, 0, 0, 1, "", 10)
+   While $sleepsec > 0
+	   $message = $sleepsec & @LF
+	   ControlSetText("Please wait!", "", "Static1", $message1 & $message)
+	   sleep(1000)
+	   $sleepsec = $sleepsec - 1
+	WEnd
+ EndFunc
+
+
+; Ham exit autoit script bang hotkey
+Func Terminate()
+    Exit
+EndFunc   ;==>Terminate
